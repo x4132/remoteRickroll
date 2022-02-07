@@ -3,6 +3,7 @@ const path = require("path");
 const ws = require("ws");
 const app = express();
 const port = process.env.PORT || 5000;
+var clients = []
 
 // Express Server
 app.use(express.static(path.join(__dirname, "static")));
@@ -20,7 +21,13 @@ const server = app.listen(port, () => {
 
 const wsServer = new ws.Server({ noServer: true });
 wsServer.on('connection', socket => {
-  socket.on('message', message => console.log(message.toString()));
+    clients.push(socket);
+  socket.on('message', message => {
+      console.log(message.toString());
+      clients.forEach(item => {
+          item.send("abcd");
+      })
+  });
 });
 
 server.on("upgrade", (request, socket, header) => {
